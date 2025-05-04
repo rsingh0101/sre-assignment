@@ -1,0 +1,175 @@
+rsingh@RATINDERSINGH:~/sre-assignment$ ./pre-requisites.sh 
+📦 Installing tools to /usr/local/bin
+✅ kubectl already installed: v1.32.2
+✅ kind already installed: kind v0.25.0 go1.22.9 linux/amd64
+✅ helm already installed: v3.16.3+gcfd0749
+
+🎉 All tools are installed and ready.
+rsingh@RATINDERSINGH:~/sre-assignment$ ./cluster-start.sh 2>&1 | tee cluster-start.log
+Creating cluster "mycluster" ...
+ • Ensuring node image (kindest/node:v1.33.0) 🖼  ...
+ ✓ Ensuring node image (kindest/node:v1.33.0) 🖼
+ • Preparing nodes 📦 📦   ...
+ ✓ Preparing nodes 📦 📦 
+ • Writing configuration 📜  ...
+ ✓ Writing configuration 📜
+ • Starting control-plane 🕹️  ...
+ ✓ Starting control-plane 🕹️
+ • Installing CNI 🔌  ...
+ ✓ Installing CNI 🔌
+ • Installing StorageClass 💾  ...
+ ✓ Installing StorageClass 💾
+ • Joining worker nodes 🚜  ...
+ ✓ Joining worker nodes 🚜
+Set kubectl context to "kind-mycluster"
+You can now use your cluster with:
+
+kubectl cluster-info --context kind-mycluster
+
+Thanks for using kind! 😊
+Health checking for kind based cluster
+Attempt 1: Checking if cluster 'mycluster' is up...
+Cluster not ready yet. Retrying in 5s...
+Attempt 2: Checking if cluster 'mycluster' is up...
+Cluster not ready yet. Retrying in 5s...
+Attempt 3: Checking if cluster 'mycluster' is up...
+Cluster 'mycluster' is up and nodes are ready.
+Setting up ingress for cluster
+Release "my-ingress" does not exist. Installing it now.
+NAME: my-ingress
+LAST DEPLOYED: Sun May  4 13:43:48 2025
+NAMESPACE: ingress-nginx
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+The ingress-nginx controller has been installed.
+Get the application URL by running these commands:
+  export HTTP_NODE_PORT=30000
+  export HTTPS_NODE_PORT=30001
+  export NODE_IP="$(kubectl get nodes --output jsonpath="{.items[0].status.addresses[1].address}")"
+
+  echo "Visit http://${NODE_IP}:${HTTP_NODE_PORT} to access your application via HTTP."
+  echo "Visit https://${NODE_IP}:${HTTPS_NODE_PORT} to access your application via HTTPS."
+
+An example Ingress that makes use of the controller:
+  apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    name: example
+    namespace: foo
+  spec:
+    ingressClassName: nginx
+    rules:
+      - host: www.example.com
+        http:
+          paths:
+            - pathType: Prefix
+              backend:
+                service:
+                  name: exampleService
+                  port:
+                    number: 80
+              path: /
+    # This section is only required if TLS is to be enabled for the Ingress
+    tls:
+      - hosts:
+        - www.example.com
+        secretName: example-tls
+
+If TLS is enabled for the Ingress, a Secret containing the certificate and key must also be provided:
+
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: example-tls
+    namespace: foo
+  data:
+    tls.crt: <base64 encoded cert>
+    tls.key: <base64 encoded key>
+  type: kubernetes.io/tls
+Creating custom coredns for a domain
+Warning: resource configmaps/coredns is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+configmap/coredns configured
+deployment.apps/coredns patched
+deployment.apps/my-ingress-ingress-nginx-controller patched
+Setting up Argocd in the cluster
+Release "argocd" does not exist. Installing it now.
+NAME: argocd
+LAST DEPLOYED: Sun May  4 13:44:58 2025
+NAMESPACE: argocd
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+NOTES:
+In order to access the server UI you have the following options:
+
+1. kubectl port-forward service/argocd-server -n argocd 8080:443
+
+    and then open the browser on http://localhost:8080 and accept the certificate
+
+2. enable ingress in the values file `server.ingress.enabled` and either
+      - Add the annotation for ssl passthrough: https://argo-cd.readthedocs.io/en/stable/operator-manual/ingress/#option-1-ssl-passthrough
+      - Set the `configs.params."server.insecure"` in the values file and terminate SSL at your ingress: https://argo-cd.readthedocs.io/en/stable/operator-manual/ingress/#option-2-multiple-ingress-objects-and-hosts
+
+
+After reaching the UI the first time you can login with username: admin and the random password generated during the installation. You can find the password by running:
+
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+(You should delete the initial secret afterwards as suggested by the Getting Started Guide: https://argo-cd.readthedocs.io/en/stable/getting_started/#4-login-using-the-cli)
+Waiting for Argo CD to be fully ready...
+Waiting for deployment "argocd-server" rollout to finish: 0 of 1 updated replicas are available...
+deployment "argocd-server" successfully rolled out
+Waiting for deployment "argocd-repo-server" rollout to finish: 0 of 1 updated replicas are available...
+deployment "argocd-repo-server" successfully rolled out
+Running Argo CD deployment script
+'admin:login' logged in successfully
+Context 'localhost:8080' updated
+application 'metrics-app' created
+TIMESTAMP                  GROUP                    KIND       NAMESPACE                   NAME    STATUS   HEALTH            HOOK  MESSAGE
+2025-05-04T13:50:09+00:00                      Namespace                            metrics-app    Synced                           
+2025-05-04T13:50:09+00:00                        Service      metrics-app           metrics-app    Synced  Healthy                  
+2025-05-04T13:50:09+00:00                     ServiceAccount  metrics-app           metrics-app    Synced                           
+2025-05-04T13:50:09+00:00   apps              Deployment      metrics-app           metrics-app    Synced  Progressing              
+2025-05-04T13:50:09+00:00  networking.k8s.io     Ingress      metrics-app           metrics-app    Synced  Progressing              
+2025-05-04T13:50:10+00:00                      Namespace      metrics-app           metrics-app   Running   Synced                  namespace/metrics-app unchanged
+2025-05-04T13:50:10+00:00                     ServiceAccount  metrics-app           metrics-app    Synced                           serviceaccount/metrics-app unchanged
+2025-05-04T13:50:10+00:00                        Service      metrics-app           metrics-app    Synced  Healthy                  service/metrics-app unchanged
+2025-05-04T13:50:10+00:00   apps              Deployment      metrics-app           metrics-app    Synced  Progressing              deployment.apps/metrics-app configured
+2025-05-04T13:50:10+00:00  networking.k8s.io     Ingress      metrics-app           metrics-app    Synced  Progressing              ingress.networking.k8s.io/metrics-app unchanged
+
+Name:               argocd/metrics-app
+Project:            default
+Server:             https://kubernetes.default.svc
+Namespace:          metrics-app
+URL:                https://argocd.mykubernetescluster.com/applications/metrics-app
+Source:
+- Repo:             https://github.com/rsingh0101/sre-assignment.git
+  Target:           main
+  Path:             metrics-app
+  Helm Values:      metrics-app.yaml
+SyncWindow:         Sync Allowed
+Sync Policy:        Automated (Prune)
+Sync Status:        Synced to main (8ac150c)
+Health Status:      Progressing
+
+Operation:          Sync
+Sync Revision:      8ac150caaf7e0128fb9022809687b7ee2cca1f1c
+Phase:              Succeeded
+Start:              2025-05-04 13:50:09 +0000 UTC
+Finished:           2025-05-04 13:50:10 +0000 UTC
+Duration:           1s
+Message:            successfully synced (all tasks run)
+
+GROUP              KIND            NAMESPACE    NAME         STATUS   HEALTH       HOOK  MESSAGE
+                   Namespace       metrics-app  metrics-app  Running  Synced             namespace/metrics-app unchanged
+                   ServiceAccount  metrics-app  metrics-app  Synced                      serviceaccount/metrics-app unchanged
+                   Service         metrics-app  metrics-app  Synced   Healthy            service/metrics-app unchanged
+apps               Deployment      metrics-app  metrics-app  Synced   Progressing        deployment.apps/metrics-app configured
+networking.k8s.io  Ingress         metrics-app  metrics-app  Synced   Progressing        ingress.networking.k8s.io/metrics-app unchanged
+                   Namespace                    metrics-app  Synced                      
+pod/test created
+Your password to login in server is: Lg-KPF7cGTY2EYTv
+Login here: http://argocd.mykubernetescluster.com:30000/
+rsingh@RATINDERSINGH:~/sre-assignment$ 
