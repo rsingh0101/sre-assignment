@@ -10,7 +10,7 @@ REVISION="main"
 PATH_IN_REPO="metrics-app"
 DEST_SERVER="https://kubernetes.default.svc"
 DEST_NAMESPACE="metrics-app"
-PATH_VALUES_IN_REPO="metrics-app/metrics-app.yaml"
+PATH_VALUES_IN_REPO="metrics-app.yaml"
 
 ARGO_SERVER=$(kubectl get po -n argocd --no-headers -l  app.kubernetes.io/name=argocd-server | awk '{print $1}')
 # Login to ArgoC
