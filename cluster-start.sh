@@ -1,5 +1,5 @@
 CLUSTER_NAME=mycluster
-DOMAIN=mycluster.com
+DOMAIN=mykubernetescluster.com
 kind create cluster --name mycluster --config cluster.yaml --image kindest/node:v1.33.0
 echo "Health checking for kind based cluster"
 MAX_RETRIES=10
@@ -23,7 +23,7 @@ for i in $(seq 1 $MAX_RETRIES); do
       Corefile: |
         .:53 {
           errors
-          health{
+          health {
             lameduck 5s
           }
           ready
@@ -48,7 +48,7 @@ EOF
         ; $DOMAIN file
         $DOMAIN.    IN    SOA    sns.dns.icann.org. noc.dns.icann.org. 2015082541 7200 3600 1209600 3600
 EOF
-    for ((i=0;i<=1;i++)) ; do
+    for ((i=0;i<=0;i++)) ; do
       NODE=$(kubectl get no -o jsonpath="{.items[$((i))].status.addresses[0].address}")
       echo "        *.$DOMAIN.    IN    A    $NODE" >> coredns-cm.yaml
     done   
@@ -106,7 +106,9 @@ EOF
     echo "Setting up Argocd in the cluster"
     helm upgrade --install argocd ./argo-cd/ -f ./argo-cd/values.yaml -n argocd --create-namespace
     sleep 10
-    ./argo-cd.sh
+    echo "Deploying application in argocd"
+    sh argo-cd.sh
+    kubectl run test --image=nginx
     exit 0
   fi
 
