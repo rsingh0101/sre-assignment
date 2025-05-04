@@ -27,21 +27,21 @@ In Ubuntu/linux, edit hosts file directly ```/etc/hosts```, and add following en
 
 Open browser with 
     ```http://argocd.mykubernetescluster.com:30000```
-<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/Argo-cd.png"style="width: 100%;">
+<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/Argo-cd.png?raw=true"style="width: 100%;">
 ## Metrics app 
 
 Go to browser to run following,
 ```http://metrics-app.mykubernetescluster.com:30000/counter```
-<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-ingress.png"style="width: 100%;">
+<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-ingress.png?raw=true"style="width: 100%;">
 Response must be,
 ```Counter value: 1```
 After refresh it respond with error,
 ```The server encountered an internal error and was unable to complete your request. Either the server is overloaded or there is an error in the application.```
-<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-error.png"style="width: 100%;">
+<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-error.png?raw=true"style="width: 100%;">
 
 ## Root Cause analysis
 
-<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-error-rca.png"style="width: 100%;">
+<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-error-rca.png?raw=true"style="width: 100%;">
 
 File ```"/usr/local/lib/python3.12/random.py"```, line 319, in randrange
     raise ```ValueError(f"empty range in randrange({start}, {stop})")```
@@ -75,7 +75,7 @@ metricsFix:
 ```
 After changing templates and values file, re-applying changes to sync new changes in argocd server.
 
-<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-error-fix-1.png"style="width: 100%;">
-<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-error-fix-2.png"style="width: 100%;">
+<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-error-fix-1.png?raw=true"style="width: 100%;">
+<img src="https://github.com/rsingh0101/sre-assignment/blob/main/img/counter-error-fix-2.png?raw=true"style="width: 100%;">
 
 Now the counter is updating normally with no internal server error caused by logic error in code.
