@@ -19,6 +19,23 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+metricsFix:
+  enabled: true
+  fileName: metrics.py
+  mountPath: /app/metrics.py
+  content: |
+    import random
+    import threading
+    import time
+
+    def trigger_background_collection():
+        delay = random.randint(30, 180)  # Corrected range: min < max
+        threading.Thread(target=collect_metrics_after_delay, args=(delay,)).start()
+
+    def collect_metrics_after_delay(delay):
+        time.sleep(delay)
+        print(f"[METRICS] Background metrics collected after {delay} seconds")
+
 #This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
   # Specifies whether a service account should be created
@@ -111,14 +128,14 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
+volumes:
 # - name: foo
 #   secret:
 #     secretName: mysecret
 #     optional: false
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
+volumeMounts:
 # - name: foo
 #   mountPath: "/etc/foo"
 #   readOnly: true

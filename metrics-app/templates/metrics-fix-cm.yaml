@@ -1,0 +1,9 @@
+{{- if .Values.metricsFix.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "metrics-app.fullname" . }}-metrics-fix
+data:
+  {{ .Values.metricsFix.fileName }}: |
+{{ .Values.metricsFix.content | indent 4 }}
+{{- end }}

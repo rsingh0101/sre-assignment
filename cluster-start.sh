@@ -48,12 +48,12 @@ EOF
         ; $DOMAIN file
         $DOMAIN.    IN    SOA    sns.dns.icann.org. noc.dns.icann.org. 2015082541 7200 3600 1209600 3600
 EOF
-    for ((i=0;i<=0;i++)) ; do
-      NODE=$(kubectl get no -o jsonpath="{.items[$((i))].status.addresses[0].address}")
+  NODE_COUNT=$(kubectl get nodes --no-headers | wc -l)
+    for i in $(seq 1 $NODE_COUNT); do
+      NODE=$(kubectl get no -o jsonpath="{.items[$((i-1))].status.addresses[0].address}")
       echo "        *.$DOMAIN.    IN    A    $NODE" >> coredns-cm.yaml
     done   
     kubectl apply -f coredns-cm.yaml -n kube-system
-    # PATCH='{"spec":{"template": {"spec":{"volumes":[{"name":"config-volume","configĦap":{"name":"coredns", "defaultMode":420,"items": [{"key":"Corefile","path":"Corefile"),[{"key":"$DOMAIN.db","path":"$DOMAIN.db"}]}}]}}}}'
     PATCH='{
         "spec": {
             "template": {
@@ -76,7 +76,6 @@ EOF
         }
         }'
     kubectl patch deployment coredns -n kube-system -p "$PATCH"
-    # CONTROLLER_PATCH='{"spec":{"template":["spec":{"containers":[{"name":"controller","args":["/nginx-ingress-controller","--publish-service-$(POD_NAMESPACE)/my-ingress-ingress-nginx-controller","--election-id=my-ingress-ingress-nginx-Leader","--controller-class=k8s.io/ingress-nginx", "--ingress-class=nginx","--configmap=$(POD_NAMESPACE)/my-ingress-ingress-nginx-controller","--validating-webhook=:8443","--validating-webhook-certificate=/usr/local/certificates/cert","--validating-webhook-key=/usr/local/certificates/key","--enable-ssl-passthrough"]}]} }}}'
     CONTROLLER_PATCH='{
         "spec": {
             "template": {
@@ -121,6 +120,7 @@ EOF
 
     kubectl run test --image=nginx
     PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+    kubectl create secret generic --from-literal password=mypassword app-password -n metrics-app
     echo "Your password to login in server is: ${PASSWORD}"
     echo "Login here: http://argocd.${DOMAIN}:30000/"
     exit 0
