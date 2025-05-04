@@ -105,10 +105,24 @@ EOF
     kubectl patch deployment my-ingress-ingress-nginx-controller -n ingress-nginx -p "$CONTROLLER_PATCH"
     echo "Setting up Argocd in the cluster"
     helm upgrade --install argocd ./argo-cd/ -f ./argo-cd/values.yaml -n argocd --create-namespace    
-    echo "Deploying application in argocd"
-    sleep 20
+    echo "Waiting for Argo CD to be fully ready..."
+
+    kubectl rollout status deployment argocd-server -n argocd --timeout=120s
+    kubectl rollout status deployment argocd-repo-server -n argocd --timeout=120s
+
+    for i in {1..12}; do
+      kubectl get secret argocd-initial-admin-secret -n argocd >/dev/null 2>&1 && break
+      echo "Waiting for argocd-initial-admin-secret... ($i)"
+      sleep 5
+    done
+
+    echo "Running Argo CD deployment script"
     sh argo-cd.sh
+
     kubectl run test --image=nginx
+    PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+    echo "Your password to login in server is: ${PASSWORD}"
+    echo "Login here: http://argocd.${DOMAIN}:30000/"
     exit 0
   fi
 
