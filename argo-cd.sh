@@ -14,7 +14,7 @@ PATH_VALUES_IN_REPO=""
 
 ARGO_SERVER=$(kubectl get po -n argocd --no-headers -l  app.kubernetes.io/name=argocd-server | awk '{print $1}')
 # Login to ArgoC
-kubectl exec -it -n argocd $ARGO_SERVER -- argocd login "$ARGOCD_SERVER" --username "$USERNAME" --password "$PASSWORD" --insecure 
+kubectl exec -it -n argocd $ARGO_SERVER -- argocd login "$ARGOCD_SERVER" --username "$USERNAME" --password "$PASSWORD" --insecure --plaintext
 
 # Create the Argo CD app
 kubectl exec -it -n argocd $ARGO_SERVER -- argocd app create "$APP_NAME" \

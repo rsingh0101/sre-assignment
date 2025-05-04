@@ -104,9 +104,9 @@ EOF
         }'
     kubectl patch deployment my-ingress-ingress-nginx-controller -n ingress-nginx -p "$CONTROLLER_PATCH"
     echo "Setting up Argocd in the cluster"
-    helm upgrade --install argocd ./argo-cd/ -f ./argo-cd/values.yaml -n argocd --create-namespace
-    sleep 10
+    helm upgrade --install argocd ./argo-cd/ -f ./argo-cd/values.yaml -n argocd --create-namespace    
     echo "Deploying application in argocd"
+    sleep 20
     sh argo-cd.sh
     kubectl run test --image=nginx
     exit 0

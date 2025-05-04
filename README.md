@@ -12,7 +12,7 @@ Docker/Docker desktop standard installation for running kubernetes cluster
 Alter domain if required in ```cluster-start.sh``` script for custom domain name (```default: mykubernetescluster.com``` ).
 
 Run the script-
-```./cluster-start.sh```
+```./cluster-start.sh 2>&1 | tee -a cluster-start.log```
 
 ## Verification
 Create hosts entry for dns resolution
