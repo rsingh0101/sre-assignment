@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: {{- if .Values.namespace }}{{ .Values.namespace }}{{- else }}{{ .Release.Namespace }}{{- end }}
+  name: {{ if .Values.namespace }}{{ .Values.namespace }}{{ else }}{{ .Release.Namespace }}{{ end }}

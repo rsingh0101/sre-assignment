@@ -9,8 +9,8 @@ REPO_URL="https://github.com/rsingh0101/sre-assignment.git"
 REVISION="main"
 PATH_IN_REPO="metrics-app"
 DEST_SERVER="https://kubernetes.default.svc"
-DEST_NAMESPACE="metrics-app/metrics-app.yaml"
-PATH_VALUES_IN_REPO=""
+DEST_NAMESPACE="metrics-app"
+PATH_VALUES_IN_REPO="metrics-app/metrics-app.yaml"
 
 ARGO_SERVER=$(kubectl get po -n argocd --no-headers -l  app.kubernetes.io/name=argocd-server | awk '{print $1}')
 # Login to ArgoC
@@ -27,8 +27,7 @@ kubectl exec -it -n argocd $ARGO_SERVER -- argocd app create "$APP_NAME" \
   --project "$PROJECT" \
   --sync-policy automated \
   --auto-prune \
-  --self-heal \
-  --create-namespace
+  --self-heal 
 
 sleep 5
 # Sync the app
